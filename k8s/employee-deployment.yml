@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employee
+  namespace: default
+  labels:
+    app: employee
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: employee
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: employee
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: employee
+          image: sourav72/employee-service:0.0.1-SNAPSHOT
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /actuator/health
+            initialDelaySeconds: 20
+            timeoutSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /actuator/health
+            initialDelaySeconds: 20
+            timeoutSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 30
+          env:
+            - name: MYSQL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: mysql-database-host
+                  name: cluster-config-map
+            - name: EMPLOYEE_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: employee-database-name
+                  name: cluster-config-map
+            - name: MYSQL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: mysql-database-port
+                  name: cluster-config-map
+            - name: MYSQL_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: mysql-db-username
+                  name: cluster-secret
+            - name: MYSQL_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: mysql-root-password
+                  name: cluster-secret
+          ports:
+            - containerPort: 8080
+              name: employee
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: employee-lb
+spec:
+  selector:
+    app: employee
+  type: LoadBalancer
+  sessionAffinity: None
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  ports:
+    - name: employee
+      protocol: TCP
+      port: 80
+      targetPort: 8080

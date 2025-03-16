@@ -2,9 +2,9 @@ spring:
   application:
     name: employee-service
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${EMPLOYEE_DB_NAME:employee}
-    username: ${MYSQL_DB_USERNAME:root}
-    password: ${MYSQL_DB_PASSWORD:root}
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT:3306}/${EMPLOYEE_DB_NAME}
+    username: ${MYSQL_DB_USERNAME}
+    password: ${MYSQL_DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
