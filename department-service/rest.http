@@ -1,0 +1,27 @@
+@host=http://localhost:8080
+
+POST {{host}}/api/department HTTP/1.1
+Content-Type: application/json
+
+{
+  "departmentName": "Security",
+  "departmentAddress": "Gitanjali Park"
+}
+
+### List All Departments
+GET {{host}}/api/department HTTP/1.1
+
+### Get a Department by Id
+GET {{host}}/api/department/1
+
+### Delete a department by Id
+DELETE {{host}}/api/department/2
+
+### Update the department by Id
+PUT {{host}}/api/department/5 HTTP/1.1
+Content-Type: application/json
+
+{
+  "departmentName": "Politics",
+  "departmentAddress": "Gitanjali Pur"
+}
